@@ -6,33 +6,44 @@
 # See the solution video in the 100 Days of Python Course for explainations.
 
 
-from datetime import datetime
-import pandas
-import random
+import requests
 import smtplib
 import os
 
 # import os and use it to get the Github repository secrets
 MY_EMAIL = os.environ.get("MY_EMAIL")
 MY_PASSWORD = os.environ.get("MY_PASSWORD")
+MY_API_KEY = os.environ.get("MY_API_KEY")
+MY_URL = os.environ.get("MY_URL")
+MY_LAT = os.environ.get("MY_LAT")
+MY_LON = os.environ.get("MY_LON")
 
-today = datetime.now()
-today_tuple = (today.month, today.day)
+parameters = {
+    "lat": MY_LAT,
+    "lon": MY_LON,
+    "appid": MY_API_KEY,
+    "cnt": 4,
+}
+response = requests.get(url=MY_URL, params=parameters)
+response.raise_for_status()
+weather_data = response.json()
 
-data = pandas.read_csv("birthdays.csv")
-birthdays_dict = {(data_row["month"], data_row["day"])                  : data_row for (index, data_row) in data.iterrows()}
-if today_tuple in birthdays_dict:
-    birthday_person = birthdays_dict[today_tuple]
-    file_path = f"letter_templates/letter_{random.randint(1, 3)}.txt"
-    with open(file_path) as letter_file:
-        contents = letter_file.read()
-        contents = contents.replace("[NAME]", birthday_person["name"])
+will_rain = False
+for hour_data in weather_data["list"]:
+    condition_data = hour_data["weather"][0]["id"]
+    if condition_data < 511:
+        will_rain = True
 
-    with smtplib.SMTP("YOUR EMAIL PROVIDER SMTP SERVER ADDRESS") as connection:
-        connection.starttls()
-        connection.login(MY_EMAIL, MY_PASSWORD)
-        connection.sendmail(
-            from_addr=MY_EMAIL,
-            to_addrs=birthday_person["email"],
-            msg=f"Subject:Happy Birthday!\n\n{contents}"
-        )
+if will_rain:
+    connection = smtplib.SMTP("smtp.gmail.com", port=587)
+    connection.starttls()
+    connection.login(user=MY_EMAIL, password=MY_PASSWORD)
+    connection.sendmail(
+        from_addr=MY_EMAIL,
+        to_addrs=MY_EMAIL,
+        msg=f"Subject: Take an Umbrella \n\n It's going to rain today.\nRemember to take an ☂"
+    )
+    connection.close()
+
+
+
