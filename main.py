@@ -14,7 +14,6 @@ import os
 MY_EMAIL = os.environ.get("MY_EMAIL")
 MY_PASSWORD = os.environ.get("MY_PASSWORD")
 MY_API_KEY = os.environ.get("MY_API_KEY")
-MY_URL = os.environ.get("MY_URL")
 MY_LAT = os.environ.get("MY_LAT")
 MY_LON = os.environ.get("MY_LON")
 
@@ -24,7 +23,7 @@ parameters = {
     "appid": MY_API_KEY,
     "cnt": 4,
 }
-response = requests.get(url=MY_URL, params=parameters)
+response = requests.get(url="https://api.openweathermap.org/data/2.5/forecast", params=parameters)
 response.raise_for_status()
 weather_data = response.json()
 
