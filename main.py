@@ -40,7 +40,7 @@ if will_rain:
     connection.sendmail(
         from_addr=MY_EMAIL,
         to_addrs=MY_EMAIL,
-        msg=f"Subject: Take an Umbrella \n\n It's going to rain today.\nRemember to take an ☂"
+        msg=f"Subject: Take an Umbrella \n\n It's going to rain today.\nRemember to take an Umbrella."
     )
     connection.close()
 
